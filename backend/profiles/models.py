@@ -25,7 +25,7 @@ class User(AbstractUser):
         upload_to='users/',
         blank=True,
         null=True,
-        verbose_name='Аватар',
+        verbose_name='Картинка',
     )
 
     class Meta:
