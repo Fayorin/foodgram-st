@@ -1,124 +1,121 @@
-from profiles.models import User
-from django.core.validators import MinValueValidator
 from django.db import models
+from django.core.validators import MinValueValidator
+from profiles.models import User
 
 
-class Ingredient(models.Model):
-    name = models.CharField(
+class Product(models.Model):
+    title = models.CharField(
         max_length=100,
-        verbose_name="Название",
+        verbose_name="Ингредиент",
     )
-    measurement_unit = models.CharField(
+    unit = models.CharField(
         max_length=10,
-        verbose_name="Единица измерения",
+        verbose_name="Мера",
     )
 
     class Meta:
-        verbose_name = "Ингредиент"
-        verbose_name_plural = "Ингредиенты"
-        ordering = ['name']
+        verbose_name = "Продукт"
+        verbose_name_plural = "Продукты"
+        ordering = ['title']
 
     def __str__(self):
-        return self.name
+        return f"{self.title} ({self.unit})"
 
 
-class Recipe(models.Model):
-    author = models.ForeignKey(
+class Dish(models.Model):
+    creator = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='recipes',
-        related_query_name='recipe',
-        verbose_name='Автор',
+        related_name='created_dishes',
+        verbose_name='Создатель',
     )
-    name = models.CharField(
+    title = models.CharField(
         max_length=256,
-        verbose_name='Название',
+        verbose_name='Название блюда',
     )
-    image = models.ImageField(
-        upload_to='recipes/',
-        verbose_name='Изображение',
+    picture = models.ImageField(
+        upload_to='dishes/',
+        verbose_name='Картинка',
     )
-    text = models.TextField(
-        verbose_name="Описание",
+    description = models.TextField(
+        verbose_name="Инструкция",
     )
-    cooking_time = models.IntegerField(
+    duration = models.PositiveIntegerField(
         validators=[MinValueValidator(1)],
-        verbose_name="Время приготовления",
+        verbose_name="Время готовки (мин)",
     )
-    pub_date = models.DateTimeField(
+    created_at = models.DateTimeField(
         auto_now_add=True,
-        verbose_name="Дата публикации"
+        verbose_name="Добавлено"
     )
 
     class Meta:
-        verbose_name = "Рецепт"
-        verbose_name_plural = "Рецепты"
-        ordering = ['-pub_date']
+        verbose_name = "Блюдо"
+        verbose_name_plural = "Блюда"
+        ordering = ['-created_at']
 
     def __str__(self):
-        return self.name
+        return self.title
 
 
-class IngredientInRecipe(models.Model):
-    recipe = models.ForeignKey(
-        'Recipe',
+class Component(models.Model):
+    dish = models.ForeignKey(
+        Dish,
         on_delete=models.CASCADE,
-        related_name='ingredient_amounts',
-        verbose_name="Рецепт",
+        related_name='components',
+        verbose_name="Блюдо",
     )
-    ingredient = models.ForeignKey(
-        Ingredient,
+    product = models.ForeignKey(
+        Product,
         on_delete=models.CASCADE,
-        related_name='ingredients',
-        verbose_name="Ингридиент",
+        related_name='used_in',
+        verbose_name="Продукт",
     )
-    amount = models.PositiveIntegerField(
+    quantity = models.PositiveIntegerField(
         validators=[MinValueValidator(1)],
-        verbose_name="Количество",
+        verbose_name="Объём",
     )
 
     class Meta:
-        verbose_name = "Ингредиент в рецепте"
-        verbose_name_plural = "Ингредиенты в рецептах"
-        unique_together = (
-            'recipe',
-            'ingredient'
-        )
+        verbose_name = "Компонент блюда"
+        verbose_name_plural = "Компоненты блюд"
+        unique_together = ('dish', 'product')
 
 
-class Favorite(models.Model):
+class Bookmark(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='favorites',
-        verbose_name="Пользователь",
+        related_name='bookmarks',
+        verbose_name="Аккаунт",
     )
-    recipe = models.ForeignKey(
-        'Recipe',
+    dish = models.ForeignKey(
+        Dish,
         on_delete=models.CASCADE,
-        related_name='favorited_by',
-        verbose_name="Рецепт",
+        related_name='bookmarked_by',
+        verbose_name="Блюдо",
     )
 
     class Meta:
-        verbose_name = "Избранное"
-        verbose_name_plural = "Избранное"
+        verbose_name = "Закладка"
+        verbose_name_plural = "Закладки"
 
 
-class ShoppingCart(models.Model):
+class Basket(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='shopping_cart',
-        verbose_name="Пользователь",
+        related_name='baskets',
+        verbose_name="Покупатель",
     )
-    recipe = models.ForeignKey(
-        'Recipe',
+    dish = models.ForeignKey(
+        Dish,
         on_delete=models.CASCADE,
-        related_name='in_carts',
-        verbose_name="Рецепт",
+        related_name='in_baskets',
+        verbose_name="Блюдо",
     )
 
     class Meta:
-        verbose_name = "Корзина"
-        verbose_name_plural = "Корзины"
+        verbose_name = "Список покупок"
+        verbose_name_plural = "Списки покупок"
+    
