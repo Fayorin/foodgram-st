@@ -2,73 +2,73 @@ from django.contrib import admin
 from django.db.models import Count
 
 from .models import (
-    Ingredient,
-    Recipe,
-    IngredientInRecipe,
-    Favorite,
-    ShoppingCart,
+    Product,
+    Dish,
+    Component,
+    Bookmark,
+    Basket,
 )
 
 
-@admin.register(Ingredient)
-class IngredientAdmin(admin.ModelAdmin):
+@admin.register(Product)
+class ProductAdmin(admin.ModelAdmin):
     list_display = (
-        'name',
-        'measurement_unit',
+        'title',
+        'unit',
     )
     search_fields = (
-        'name',
+        'title',
     )
 
 
-class IngredientInRecipeInline(admin.TabularInline):
-    model = IngredientInRecipe
+class ComponentInline(admin.TabularInline):
+    model = Component
     extra = 1
 
 
-@admin.register(Recipe)
-class RecipeAdmin(admin.ModelAdmin):
+@admin.register(Dish)
+class DishAdmin(admin.ModelAdmin):
     list_display = (
-        'name',
-        'author',
-        'favorites_count'
+        'title',
+        'creator',
+        'bookmarked_total',
     )
     search_fields = (
-        'name',
-        'author__username',
-        'author__email',
+        'title',
+        'creator__username',
+        'creator__email',
     )
-    inlines = [IngredientInRecipeInline]
+    inlines = [ComponentInline]
 
     def get_queryset(self, request):
-        queryset = super().get_queryset(request)
-        return queryset.annotate(fav_count=Count('favorited_by'))
+        qs = super().get_queryset(request)
+        return qs.annotate(bookmark_count=Count('bookmarked_by'))
 
-    @admin.display(description='Добавлений в избранное')
-    def favorites_count(self, obj):
-        return obj.fav_count
+    @admin.display(description='В избранном раз')
+    def bookmarked_total(self, obj):
+        return obj.bookmark_count
 
 
-@admin.register(Favorite)
-class FavoriteAdmin(admin.ModelAdmin):
+@admin.register(Bookmark)
+class BookmarkAdmin(admin.ModelAdmin):
     list_display = (
         'user',
-        'recipe',
+        'dish',
     )
 
 
-@admin.register(ShoppingCart)
-class ShoppingCartAdmin(admin.ModelAdmin):
+@admin.register(Basket)
+class BasketAdmin(admin.ModelAdmin):
     list_display = (
         'user',
-        'recipe',
+        'dish',
     )
 
 
-@admin.register(IngredientInRecipe)
-class IngredientInRecipeAdmin(admin.ModelAdmin):
+@admin.register(Component)
+class ComponentAdmin(admin.ModelAdmin):
     list_display = (
-        'recipe',
-        'ingredient',
-        'amount',
+        'dish',
+        'product',
+        'quantity',
     )
