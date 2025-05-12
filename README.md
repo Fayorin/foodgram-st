@@ -13,19 +13,6 @@
     git clone https://github.com/Fayorin/foodgram-st.git
     cd foodgram-st
     ```
-
-2. Cоздайте файл `.env` в корневом каталоге и укажите в нём переменные:
-    ```env
-    POSTGRES_USER=django_user
-    POSTGRES_PASSWORD=django_password
-    POSTGRES_DB=django
-
-    DB_HOST=db
-    DB_PORT=5432
-
-    ALLOWED_HOSTS="127.0.0.1 localhost"
-    ```
-
 ### Сборка и запуск контейнеров
 
 1. Запустите сборку и запуск контейнеров:
