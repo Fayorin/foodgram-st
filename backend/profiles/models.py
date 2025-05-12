@@ -63,7 +63,7 @@ class Follow(models.Model):
     def clean(self):
         if self.user == self.following:
             raise ValidationError(
-                "Нельзя подписаться на самого себя."
+                "Ошибка, нельзя подписаться на самого себя!!"
             )
 
     def save(self, *args, **kwargs):
